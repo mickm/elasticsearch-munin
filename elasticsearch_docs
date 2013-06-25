@@ -36,7 +36,7 @@ Tomas Doran (t0m) - c<< <bobtfish@bobtfish.net> >>
 
 =cut
 
-my $host = 'localhost';
+my $host = exists $ENV{'host'} ? $ENV{'host'} : 'localhost';
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
