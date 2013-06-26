@@ -53,11 +53,11 @@ sub get_json_from_url {
 
 my $data = get_json_from_url("http://$host:$port/_cluster/nodes");
 my $t_data = get_json_from_url("http://$host:$port/_cluster/nodes/stats");
-my %out;
+my %out = (num_docs => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
     next unless $t_data->{nodes}{$full_node_name};
-    $out{num_docs} = $t_data->{nodes}{$full_node_name}{indices}{docs}{count};
+    $out{num_docs} += $t_data->{nodes}{$full_node_name}{indices}{docs}{count};
 }
 
 if ($ARGV[0] and $ARGV[0] eq 'config') {

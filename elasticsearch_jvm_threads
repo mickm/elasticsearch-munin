@@ -53,12 +53,12 @@ sub get_json_from_url {
 
 my $data = get_json_from_url("http://$host:$port/_cluster/nodes?jvm=true");
 my $t_data = get_json_from_url("http://$host:$port/_cluster/nodes/stats?jvm=true");
-my %out;
+my %out = (count => 0, peak_count => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
     next unless $t_data->{nodes}{$full_node_name};
     foreach my $name (keys %{ $t_data->{nodes}{$full_node_name}{jvm}{threads} }) {
-        $out{$name} = $t_data->{nodes}{$full_node_name}{jvm}{threads}{$name};
+        $out{$name} += $t_data->{nodes}{$full_node_name}{jvm}{threads}{$name};
     }
 }
 if ($ARGV[0] and $ARGV[0] eq 'config') {

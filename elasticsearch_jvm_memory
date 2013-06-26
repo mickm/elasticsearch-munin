@@ -52,12 +52,13 @@ sub get_json_from_url {
 }
 
 my $data = get_json_from_url("http://$host:$port/_cluster/nodes?jvm=true");
-my %out;
+my %out = (direct_max => 0, heap_init =>0, heap_max => 0, non_heap_init => 0, non_heap_max => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
+    next unless $data->{nodes}{$full_node_name};
     foreach my $name (grep { /_in_bytes$/ } keys %{ $data->{nodes}{$full_node_name}{jvm}{mem} }) {
         my ($dname) = $name =~ m/(.+)_in_bytes$/;
-        $out{$dname} = $data->{nodes}{$full_node_name}{jvm}{mem}{$name};
+        $out{$dname} += $data->{nodes}{$full_node_name}{jvm}{mem}{$name};
     }
 }
 if ($ARGV[0] and $ARGV[0] eq 'config') {

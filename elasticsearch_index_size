@@ -53,11 +53,11 @@ sub get_json_from_url {
 
 my $data = get_json_from_url("http://$host:$port/_cluster/nodes");
 my $t_data = get_json_from_url("http://$host:$port/_cluster/nodes/stats");
-my %out;
+my %out = (index_size => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
     next unless $t_data->{nodes}{$full_node_name};
-    $out{index_size} = $t_data->{nodes}{$full_node_name}{indices}{store}{size_in_bytes};
+    $out{index_size} += $t_data->{nodes}{$full_node_name}{indices}{store}{size_in_bytes};
 }
 if ($ARGV[0] and $ARGV[0] eq 'config') {
     print "graph_args --base 1024\n";
