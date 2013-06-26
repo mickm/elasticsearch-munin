@@ -36,7 +36,8 @@ Tomas Doran (t0m) - c<< <bobtfish@bobtfish.net> >>
 
 =cut
 
-my $host = 'localhost';
+my $host = exists $ENV{'host'} ? $ENV{'host'} : 'localhost';
+my $port = exists $ENV{'port'} ? $ENV{'port'} : 9200;
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
@@ -50,13 +51,13 @@ sub get_json_from_url {
     return $data;
 }
 
-my $data = get_json_from_url("http://$host:9200/_cluster/nodes");
-my $t_data = get_json_from_url("http://$host:9200/_cluster/nodes/stats");
-my %out;
+my $data = get_json_from_url("http://$host:$port/_cluster/nodes");
+my $t_data = get_json_from_url("http://$host:$port/_cluster/nodes/stats");
+my %out = (num_docs => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
     next unless $t_data->{nodes}{$full_node_name};
-    $out{num_docs} = $t_data->{nodes}{$full_node_name}{indices}{docs}{count};
+    $out{num_docs} += $t_data->{nodes}{$full_node_name}{indices}{docs}{count};
 }
 
 if ($ARGV[0] and $ARGV[0] eq 'config') {
