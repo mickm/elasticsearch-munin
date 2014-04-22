@@ -51,8 +51,8 @@ sub get_json_from_url {
     return $data;
 }
 
-my $data = get_json_from_url("http://$host:$port/_cluster/nodes");
-my $t_data = get_json_from_url("http://$host:$port/_cluster/nodes/stats");
+my $data = get_json_from_url("http://$host:$port/_nodes");
+my $t_data = get_json_from_url("http://$host:$port/_nodes/stats");
 my %out = (index_size => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
