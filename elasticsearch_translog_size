@@ -18,7 +18,8 @@ if [ "$1" = "config" ]; then
         exit 0
 fi
 
-NUMBER=`ls /srv/elasticsearch/metacpan_v1/nodes/0/indices/*/*/translog/* | wc -l`
-SIZE=`du -s /srv/elasticsearch/metacpan_v1/nodes/0/indices/*/*/translog/* | awk '{sum+=$1};END{print sum}'`
+DIR=`ps -u elasticsearch -opid,command |tail -1| perl -ne 'print $1 if(/-Des.default.path.data=([\w\/]+)/)'`
+NUMBER=`ls $DIR/*/nodes/0/indices/*/*/translog/* | wc -l`
+SIZE=`du -s $DIR/*/nodes/0/indices/*/*/translog/* | awk '{sum+=$1};END{print sum}'`
 echo "number.value $NUMBER"
 echo "size.value $SIZE"
