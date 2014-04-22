@@ -17,9 +17,6 @@ if [ "$1" = "config" ]; then
         exit 0
 fi
 
-
-# while true; do su -c 'ls /proc/$(pidof whatever)/fd' elasticsearch |wc -l |nc  -l -q0 localhost 9998; done 
-
 PID=`ps -u elasticsearch -opid,comm | grep java | awk '{ print $1 }'`
 VALUE=`ls /proc/$PID/fd/ | wc | awk '{ print $1 }'`
 MAX_VALUE=`grep 'Max open files' /proc/$PID/limits | awk '{ print $5 }'`
