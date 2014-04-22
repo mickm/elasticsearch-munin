@@ -16,7 +16,7 @@ use JSON qw/decode_json/;
                               
 =head1 NAME                   
                               
-elasticsearch_jvm - A munin plugin that collects stats from the JVM of your elasticsearch instances
+elasticsearch_cache - A munin plugin that collects cache stats of your elasticsearch instances
                               
 =head1 APPLICABLE SYSTEMS     
                               
