@@ -50,7 +50,7 @@ sub get_json_from_url {
     return $data;
 }
 
-my $data = get_json_from_url("http://$host:9200/_cluster/nodes?jvm=true");
+my $data = get_json_from_url("http://$host:9200/_nodes?jvm=true");
 my %out;
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
