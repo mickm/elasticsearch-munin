@@ -36,7 +36,8 @@ Tomas Doran (t0m) - c<< <bobtfish@bobtfish.net> >>
 
 =cut
 
-my $host = 'localhost';
+my $host = exists $ENV{'host'} ? $ENV{'host'} : 'localhost';
+my $port = exists $ENV{'port'} ? $ENV{'port'} : 9200;
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
@@ -50,13 +51,14 @@ sub get_json_from_url {
     return $data;
 }
 
-my $data = get_json_from_url("http://$host:9200/_cluster/nodes?jvm=true");
-my %out;
+my $data = get_json_from_url("http://$host:$port/_cluster/nodes?jvm=true");
+my %out = (direct_max => 0, heap_init =>0, heap_max => 0, non_heap_init => 0, non_heap_max => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
+    next unless $data->{nodes}{$full_node_name};
     foreach my $name (grep { /_in_bytes$/ } keys %{ $data->{nodes}{$full_node_name}{jvm}{mem} }) {
         my ($dname) = $name =~ m/(.+)_in_bytes$/;
-        $out{$dname} = $data->{nodes}{$full_node_name}{jvm}{mem}{$name};
+        $out{$dname} += $data->{nodes}{$full_node_name}{jvm}{mem}{$name};
     }
 }
 if ($ARGV[0] and $ARGV[0] eq 'config') {
