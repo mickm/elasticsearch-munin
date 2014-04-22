@@ -22,5 +22,6 @@ fi
 
 PID=`ps -u elasticsearch -opid,comm | grep java | awk '{ print $1 }'`
 VALUE=`ls /proc/$PID/fd/ | wc | awk '{ print $1 }'`
+MAX_VALUE=`grep 'Max open files' /proc/$PID/limits | awk '{ print $5 }'`
 echo "used.value $VALUE"
-echo "max.value 65000"
+echo "max.value $MAX_VALUE"
