@@ -16,16 +16,33 @@ This original codes has out of maintenance, so I have started maintenance this p
 
 ### Example Config
 
-setup this config adding into `/etc/munin/plugin-conf.d/munin-node` before install.
+Before use, put these settings into munin configuration.
+
+  * examples of munin config file 
+    *  in the case of all plugin config into single file.<br />
+      `/etc/munin/plugin-conf.d/munin-node`
+    * in the case of creating file per plugins.<br />
+      `/etc/munin/plugin-conf.d/elasticsearch`
+
+##### example of minimam configuration<br />
+
+`elasticsearch_open_files` has required root privilege to read under the `/proc`.
+
+```
+[elasticsearch_open_files]
+user root
+```
+
+##### example of custom host and port configuration
 
 ```
 [elasticsearch_*]
-env.host 10.1.2.14
+env.host localhost
 env.port 9200
 
 [elasticsearch_open_files]
 user root
-env.host 10.1.2.14
+env.host localhost
 env.port 9200
 ```
 
@@ -45,9 +62,22 @@ $ munin-node-configure | grep elasticsearch
 $ service munin-node restart
 ```
 
-## Copyright
+To confirm wokring fine or not, you can check like below.
 
-Original code has imported from https://gist.github.com/2159398 (made by [@rafl](https://github.com/rafl))
+```sh
+$ munin-run elasticsearch_jvm_memory
+heap_init.value 8589934592
+non_heap_max.value 224395264
+heap_max.value 8520204288
+direct_max.value 8520204288
+non_heap_init.value 24313856
+```
+
+## Author
+
+* Original code by [@rafl](https://github.com/rafl) has imported from https://gist.github.com/2159398
+* [Contributors to y-ken/munin-plugin-elasticsearch](https://github.com/y-ken/munin-plugin-elasticsearch/graphs/contributors)
+* maintained by [@y-ken](https://github.com/y-ken)
 
 ## Licence
 
