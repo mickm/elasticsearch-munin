@@ -10,7 +10,7 @@ if [ "$1" = "config" ]; then
         echo 'graph_title ElasticSearch translog size'
         echo 'graph_args --base 1024 -l 0'
         echo 'graph_vlabel size of translogs'
-        echo 'graph_category system'
+        echo 'graph_category elasticsearch'
         echo 'size.label size of translog files'
         echo 'size.type GAUGE'
         echo 'number.label number of translog files'

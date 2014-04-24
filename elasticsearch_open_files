@@ -8,7 +8,7 @@ if [ "$1" = "config" ]; then
         echo 'graph_title ElasticSearch open files'
         echo 'graph_args --base 1000 -l 0'
         echo 'graph_vlabel number of open files'
-        echo 'graph_category system'
+        echo 'graph_category elasticsearch'
         echo 'used.label open files'
         echo 'used.type GAUGE'
         echo 'used.info The number of currently open files.'
