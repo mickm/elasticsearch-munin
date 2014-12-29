@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+
+# Parameters supported:
+#
+# config
+# autoconf
+#
+# Magic markers:
+#%# family=auto
+#%# capabilities=autoconf
+
+use strict;
+use warnings;
+use LWP;
+use JSON qw/decode_json/;
+
+=head1 NAME
+
+elasticsearch_index_total - A munin plugin that collects stats about the index totals
+
+=head1 APPLICABLE SYSTEMS
+
+ElasticSearch
+
+=head1 CONFIGURATION
+
+None
+
+=head1 BUGS
+
+None known so far. If you find any, let me know.
+
+=head1 AUTHOR
+
+
+=cut
+
+my $host = exists $ENV{'host'} ? $ENV{'host'} : 'localhost';
+my $port = exists $ENV{'port'} ? $ENV{'port'} : 9200;
+
+my $ua = LWP::UserAgent->new;
+$ua->timeout(10);
+
+sub get_json_from_url {
+    my $uri = shift;
+    my $res = $ua->get($uri, 'Content-Type' => 'application/json' );
+    Carp::confess($res->code . " for " . $uri) unless $res->is_success;
+    my $data = do { local $@; eval { decode_json($res->content) } };
+    die("Could not decode JSON from: " . $res->content) unless $data;
+    return $data;
+}
+
+my $data = get_json_from_url("http://$host:9200/_nodes");
+my $t_data = get_json_from_url("http://$host:9200/_nodes/stats");
+my %out;
+
+foreach my $full_node_name (keys %{$data->{nodes}}) {
+    next unless $t_data->{nodes}{$full_node_name};
+    $out{index} = $t_data->{nodes}{$full_node_name}{indices}{indexing}{index_total};
+    $out{get} = $t_data->{nodes}{$full_node_name}{indices}{get}{total};
+    $out{search} = $t_data->{nodes}{$full_node_name}{indices}{search}{query_total};
+    $out{delete} = $t_data->{nodes}{$full_node_name}{indices}{indexing}{delete_total};
+}
+if ($ARGV[0] and $ARGV[0] eq 'config') {
+    print "graph_title elasticsearch index operations\n";
+    print "graph_category elasticsearch\n";
+    print "graph_args --base 1000 -l 0\n";
+    print "graph_vlabel Operations per second\n";
+            
+    print "graph_order index get search delete\n";
+    print "index.label index\n";
+    print "index.type DERIVE\n";
+    print "index.min 0\n";
+    print "index.draw LINE2\n";
+        
+    print "get.label get\n";
+    print "get.type DERIVE\n";
+    print "get.min 0\n";
+    print "get.draw LINE2\n";
+            
+    print "search.label search\n";
+    print "search.type DERIVE\n";
+    print "search.min 0\n";
+    print "search.draw LINE2\n";
+            
+    print "delete.label delete\n";
+    print "delete.type DERIVE\n";
+    print "delete.min 0\n";
+    print "delete.draw LINE2\n";
+
+}
+elsif (!$ARGV[0] || $ARGV[0] eq 'autoconf') {
+    foreach my $name (keys %out) {
+        print "$name.value " . $out{$name} . "\n";
+    }
+}
+
+exit(0);

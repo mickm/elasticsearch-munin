@@ -16,7 +16,7 @@ use JSON qw/decode_json/;
 
 =head1 NAME
 
-elasticsearch_jvm - A munin plugin that collects stats from the JVM of your elasticsearch instances
+elasticsearch_index_size - A munin plugin that collects index size of your elasticsearch instances
 
 =head1 APPLICABLE SYSTEMS
 
@@ -36,7 +36,8 @@ Tomas Doran (t0m) - c<< <bobtfish@bobtfish.net> >>
 
 =cut
 
-my $host = 'localhost';
+my $host = exists $ENV{'host'} ? $ENV{'host'} : 'localhost';
+my $port = exists $ENV{'port'} ? $ENV{'port'} : 9200;
 
 my $ua = LWP::UserAgent->new;
 $ua->timeout(10);
@@ -50,13 +51,13 @@ sub get_json_from_url {
     return $data;
 }
 
-my $data = get_json_from_url("http://$host:9200/_cluster/nodes");
-my $t_data = get_json_from_url("http://$host:9200/_cluster/nodes/stats");
-my %out;
+my $data = get_json_from_url("http://$host:$port/_nodes");
+my $t_data = get_json_from_url("http://$host:$port/_nodes/stats");
+my %out = (index_size => 0);
 
 foreach my $full_node_name (keys %{$data->{nodes}}) {
     next unless $t_data->{nodes}{$full_node_name};
-    $out{index_size} = $t_data->{nodes}{$full_node_name}{indices}{store}{size_in_bytes};
+    $out{index_size} += $t_data->{nodes}{$full_node_name}{indices}{store}{size_in_bytes};
 }
 if ($ARGV[0] and $ARGV[0] eq 'config') {
     print "graph_args --base 1024\n";
